@@ -15,7 +15,7 @@ O objetivo aqui é aprender como configurar um projeto react do zero, usando o w
 ## Códigos da aplicação
 
 ### Pasta src
-Onde ficam os códigos, principalmente javascript, daa aplicação
+Onde ficam os códigos, principalmente javascript, da aplicação
 
 ### Pasta public
 Aqui ficam arquivos públicos da aplicação como:
@@ -113,6 +113,25 @@ Use **yarn webpack** para converter o código
 
 ao definir a opção **mode** no arquivo de configuração podemos fornecer **development** ou **production**
 
+### Dev server
+
+Existe uma forma mais simples de compilar nosso bundle a cada vez que o código da aplicação é alterado, em vez de sempre executarmos **yarn webpack**.  
+Para isso, devemos instalar webpack-dev-server como funcionalidade de desenvolvimento: **yarn add webpack-dev-server -D**  
+Depois de instalar o pacote acima devemos configurar a propriedade **devServer** com um objeto de configuração:
+
+```
+...
+   devServer: {
+      static: {
+         directory: path.resolve(__dirname, 'public')
+      },
+      port: 3000 // por padrão a porta é 8080, esta opção permite usar outra porta
+   }
+...
+```
+Assim, basicamente dizemos nessa configuração onde está nosso arquivo html estático.
+Para mais detalhes acesse a [documentação oficial](https://webpack.js.org/configuration/dev-server/#devserver)
+
 ### Injetando javascript
 Instale: **yarn add html-webpack-plugin -D**
 
@@ -132,6 +151,30 @@ module.exports = {
    ...
 }
 ```
+
+### Sourcemap devtool
+
+Permite debugar o código de desenvolvimento após o build da aplicação.
+Para configurar essa funcionalidade no webpack insira a propriedade, **devtool** no arquivo de configuração do webpack. Usamos sourcemaps diferentes para desenvolvimento e para produção. **eval-source-map** é uma boa opção para desenvolvimento
+
+#### Ambiente de desenvolvimento vs ambiente de produção
+
+A variável de ambiente pode ser usada para definir se estamos em ambiente de produção ou de desenvolvimento. Definindo assim o modo do wepack com os valores **"production" ou "development"** e os valores de devtool como **"eval-source-map" ou "source-map"** conforme o caso.  
+Nos sistemas Unix podemos criar variáveis ambiente no terminal diretamente sem problemas, porém em sistemas ruindows teremos problemas. Logo, por questão de boa prática, usaremos a biblioteca **cross-env** como dependência de desenvolvimento.  
+Acrescente os seguintes scripts ao package.json:
+```
+"scripts": {
+   "dev": "webpack serve",
+   "build": "cross-env NODE_ENV=production webpack"
+},
+```
+
+### Arquivos css no javascript
+Para utilizar os arquivos css é necessário criar uma nova regra para o arquivo css e instalar os loaders: **style-loader** e o **css-loader**
+
+### Arquivos Sass
+
+Para utilizar o sass instale **yarn add sass -D**, **node-sass está deprecated embora ainda receba atualizações**, e usaremos o loader **sass-loader**.
 
 ## Renderização com react
 
