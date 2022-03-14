@@ -194,3 +194,89 @@ module.exports = {
    ]
 }
 ```
+## Estados do React e webpack
+Toda vez que salvamos nosso projeto o webpack renderiza toda a página do zero resetando todos os estados.  
+Para manter os estados no ambiente de desenvolvimento, instalaremos **yarn add @pmmmwh/react-refresh-webpack-plugin react-refresh**.  
+Feito isso basta importar e adicionar o plugin às configurações do webpack.
+```
+const reactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin")
+...
+plugins: [
+      isDevelopment && new ReactRefreshWebpackPlugin(),
+      new HtmlWebpackPlugin({
+         template: path.resolve(__dirname, "public", "index.htm")
+      })
+   ].filter(Boolean),
+...
+devServer: {
+      ...
+      hot: true,
+   }
+```
+como no caso do código acima, se estivermos em ambiente de produção não teremos a execução da função, mas o valor **false**, que não corresponde a um plugin, evitamos um erro adicionando **filter** ao final filtrando os valores booleanos.
+
+Devemos também alterar a configuração das regras do loader do babel como abaixo:
+```
+{
+   ...
+   test: /\.jsx$/, // testa se um arquivo termina com a expressão regular
+   exclude: /node_modules/, // exclui a pasta node_modules, pois cada biblioteca deve converter seus arquivos js
+   use: {
+      loader: 'babel-loader',
+      options: {
+         plugins: [
+            isDevelopment && require.resolve('react-refresh/babel')
+         ].filter(Boolean)
+      }
+   }// é uma dependência que também deve ser instalada
+   ...
+},
+```
+
+## Typescript
+
+### Adicionando o typescript à aplicação
+
+Usaremos o typescript para reconhecer tipos e facilitar o reconhecimento do que cada variável ou função deve ter ou retornar.
+
+para instalar essa dependência, que deve ser usada no react como de desenvolvimento, faça: **yarn add typescript -D**
+
+Depois de instalar essa dependência inicialize o typescript:
+```
+yarn tsc --init
+```
+
+Precisamos fazer com que o babel consiga entender o typescript, adicionando um novo preset: **yarn add @babel/preset-typescript -D**, fornecendo a configuração também no arquivo de configuração do babel:
+```
+...
+entry: path.resolve(__dirname, 'src', 'index.tsx')
+...
+resolve: {
+   extensions: [
+      ...,
+      '.ts',
+      '.tsx',
+      ...
+   ]
+},
+...
+presets: [
+      ...
+      '@babel/preset-typescript',
+      ...
+   ]
+...
+```
+
+Também devemos adicionar a extensão **".tsx"** aos testes das regras do webpack:
+```
+...
+rules: [
+   {
+      test: /\.[jt]sx?$/, // testa se um arquivo termina com a expressão regular
+      ...
+   },
+  ...
+]
+...
+```
